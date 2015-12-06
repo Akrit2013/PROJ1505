@@ -82,11 +82,11 @@ def main(argv):
     # Count the photos which pass the screen procedure
     g_qualified_counter = 0
 
+    db_size = 0
     while time_current_num < time_end_num:
         start_time = str(time_current_num)
         end_time = str(time_current_num + time_interval_num)
         text_str = None
-        db_size = 0
         extra_str = config.urls + ', ' + 'tags'
         # Counter in this time slice
         photo_counter = 0
@@ -101,6 +101,10 @@ def main(argv):
                          (tb.unixtime_to_datearr(start_time),
                           tb.unixtime_to_datearr(end_time),
                           text_str, db_size))
+                log.info('Time interval: %s' %
+                         tb.unixtime_to_datearr(time_interval_num))
+                log.info('Fetch Photos: %d, Qualified Photos: %d, Db Size: %d'
+                         % (g_photo_counter, g_qualified_counter, db_size))
                 # Search the photos according to the label
                 # A list to store all the fetched photos
                 for photo in flickr.walk(tag_mode='all',
@@ -114,7 +118,7 @@ def main(argv):
                     # Store all the photos into a list
                     photo_counter += 1
                     # Check the photo, and fetch the exif if needed
-                    exif = tb.get_exif(photo)
+                    exif = tb.get_exif(flickr, photo)
                     # If photo info and exif is invalid, return None
                     if exif is None:
                         continue
@@ -126,8 +130,20 @@ def main(argv):
         # Finish the data slice loop, re-adjust the time_interval_num
         if config.time_dynamic:
             # Dynamically adjust the time interval
-            mean_fetch_size = int(photo_counter/float(len(lens_list)*len(scenes_list)))
-            if 
+            mean_fetch_size = float(photo_counter) / batch_counter
+            if mean_fetch_size > 1.2 * int(config.batch_size):
+                time_interval_num = int(time_interval_num / 1.2)
+            elif mean_fetch_size < 0.8 * int(config.batch_size):
+                time_interval_num = int(time_interval_num / 0.8)
+        # If the photo collected more than enough, make it stop
+        if db_size > config.max_size:
+            log.info('Total collected photos: %d, stop at %s' %
+                     (db_size, tb.unixtime_to_datearr(end_time)))
+            break
+
+    # Finish the rest of the things.
+    db.close()
+
 
 
 if __name__ == "__main__":

@@ -55,6 +55,18 @@
 		</urls>
 	</fetch>
 	<hitcontrol>
-		<hit_limit>3600</hit_limit>
+		<hit_limit>3500</hit_limit>
 	</hitcontrol>
+	<photoscreen>
+		<!-- Which camera model should be collected -->
+		<camera>
+			<model focal='1.0'>canon</model>
+			<model focal='1.0'>nikon</model>
+		</camera>
+		<!-- The length width ratio of the photos -->
+        <!-- The pos can be 'hor' or 'ver' or 'all' -->
+		<LWratio>
+			<ratio error='0.1' pos='hor'>1.5</ratio>
+		</LWratio>
+	</photoscreen>
 </flickr>

@@ -38,6 +38,10 @@ class xmlconfig():
         if self.hitcontrol is None:
             log.error('This xml config file has no hitcontrol section')
 
+        self.photoscreen = self.root.find('photoscreen')
+        if self.photoscreen is None:
+            log.error('This xml config file has no photoscreen section')
+
         # Init the members of this class
         self.key = self.get_key()
         self.secret = self.get_secret()
@@ -181,3 +185,33 @@ class xmlconfig():
             combstr = combstr + str(ele) + ', '
         # Delete the last ','
         return combstr[:-2]
+
+    def get_camera_model(self):
+        """
+        The return value is a list of list, for example:
+        [[model1, focal1], [model2, focal2], ...]
+        """
+        if self.photoscreen is None:
+            return None
+        model_list = self.photoscreen.find('camera').findall('model')
+        model_dict = {}
+        for model in model_list:
+            model_dict[model.text] = model.attrib['focal']
+
+        return model_dict
+
+    def get_lwratio(self):
+        """
+        The return value is a list of list. Which means:
+        [[ratio1, error1, pos1], [ratio2, error2, pos2] ...]
+        """
+        if self.photoscreen is None:
+            return None
+
+        ratio_list = self.photoscreen.find('LWratio').findall('ratio')
+        rst = []
+        for ratio in ratio_list:
+            rst.append([ratio.text, ratio.attrib['error'],
+                       ratio.attrib['pos']])
+
+        return rst
