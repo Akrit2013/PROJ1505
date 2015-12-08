@@ -22,6 +22,7 @@ class exif():
             self.lens = None
             self.focal_in35 = None
             self.brand = None
+            self.id = None
             return
         self.exifs = self.exif.findall('exif')
         self.camera = self.get_camera()
@@ -31,6 +32,7 @@ class exif():
         self.lens = self.get_lens()
         self.focal_in35 = self.__get_focal_in35()
         self.brand = self.get_brand()
+        self.id = self.exif.get('id')
 
     def get_focal_length(self):
         for info in self.exifs:

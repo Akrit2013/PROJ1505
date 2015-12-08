@@ -15,8 +15,8 @@ import glog as log
 import sys
 import lmdbtools as lt
 import toolbox as tb
-import fliclrapi
-import math
+import flickrapi
+import pdb
 
 
 def main(argv):
@@ -31,12 +31,12 @@ def main(argv):
         sys.exit(2)
 
     for opt, arg in opts:
-        if opts == '-h':
+        if opt == '-h':
             print helpmsg
             sys.exit()
-        elif opts == '-c':
+        elif opt == '-c':
             config_file = arg
-        elif opts == '-o':
+        elif opt == '-o':
             db_file = arg
         else:
             print helpmsg
@@ -47,9 +47,10 @@ def main(argv):
 
     # Create the lmdb database
     # Check if the lmdb file is already exist
+    pdb.set_trace()
     db = lt.open_db(db_file)
     # Start to use flickrapi walk through the flickr server
-    flickr = fliclrapi.FlickrAPI(config.key, config.secret)
+    flickr = flickrapi.FlickrAPI(config.key, config.secret)
 
     time_start_num = float(config.time_start)
     time_end_num = float(config.time_end)
@@ -75,8 +76,6 @@ def main(argv):
     log.info('Start to fetch the photo info')
 
     # Globel counter
-    # This count the flickr hit times
-    g_hit_counter = 0
     # Count the total photos fetched
     g_photo_counter = 0
     # Count the photos which pass the screen procedure
@@ -126,7 +125,7 @@ def main(argv):
                         qualified_counter += 1
                     # Write the exif, photo info, label into db
                     # The database size should be returned
-                    db_size = lt.write_db(db, exif, photo, text_str)
+                    db_size = lt.write_db(db, exif, photo, text_str, config)
         # Finish the data slice loop, re-adjust the time_interval_num
         if config.time_dynamic:
             # Dynamically adjust the time interval
@@ -143,7 +142,6 @@ def main(argv):
 
     # Finish the rest of the things.
     db.close()
-
 
 
 if __name__ == "__main__":

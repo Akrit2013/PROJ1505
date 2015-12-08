@@ -60,8 +60,64 @@
 	<photoscreen>
 		<!-- Which camera model should be collected -->
 		<camera>
-			<model focal='1.0'>canon</model>
-			<model focal='1.0'>nikon</model>
+			<model focal='1.6'>canon rebel</model>
+			<model focal='1.6'>canon kiss</model>
+			<model focal='1.6'>canon 350D</model>
+			<model focal='1.6'>canon 400D</model>
+			<model focal='1.6'>canon 450D</model>
+			<model focal='1.6'>canon 500D</model>
+			<model focal='1.6'>canon 550D</model>
+			<model focal='1.6'>canon 600D</model>
+			<model focal='1.6'>canon 650D</model>
+			<model focal='1.6'>canon 700D</model>
+			<model focal='1.6'>canon 750D</model>
+			<model focal='1.6'>canon 760D</model>
+			<model focal='1.6'>canon 40D</model>
+			<model focal='1.6'>canon 50D</model>
+			<model focal='1.6'>canon 60D</model>
+			<model focal='1.6'>canon 70D</model>
+			<model focal='1.6'>canon 1100D</model>
+			<model focal='1.6'>canon 1200D</model>
+			<model focal='1.6'>canon 100D</model>
+			<model focal='1.6'>canon 7D</model>
+			<model focal='1.0'>canon 5D</model>
+			<model focal='1.0'>canon 6D</model>
+			<model focal='1.0'>canon 1ds</model>
+			<model focal='1.3'>canon 1d</model>
+			<model focal='1.5'>nikon D60</model>
+			<model focal='1.5'>nikon D70</model>
+			<model focal='1.5'>nikon D80</model>
+			<model focal='1.5'>nikon D90</model>
+			<model focal='1.5'>nikon D200</model>
+			<model focal='1.5'>nikon D300</model>
+			<model focal='1.5'>nikon D300s</model>
+			<model focal='1.5'>nikon D3000</model>
+			<model focal='1.5'>nikon D3100</model>
+			<model focal='1.5'>nikon D3200</model>
+			<model focal='1.5'>nikon D3300</model>
+			<model focal='1.5'>nikon D5000</model>
+			<model focal='1.5'>nikon D5100</model>
+			<model focal='1.5'>nikon D5200</model>
+			<model focal='1.5'>nikon D5300</model>
+			<model focal='1.5'>nikon D5400</model>
+			<model focal='1.5'>nikon D5500</model>
+			<model focal='1.5'>nikon D7000</model>
+			<model focal='1.5'>nikon D7100</model>
+			<model focal='1.5'>nikon D7200</model>
+			<model focal='1.0'>nikon D700</model>
+			<model focal='1.0'>nikon D800</model>
+			<model focal='1.0'>nikon D800e</model>
+			<model focal='1.0'>nikon D810</model>
+			<model focal='1.0'>nikon D600</model>
+			<model focal='1.0'>nikon D610</model>
+			<model focal='1.0'>nikon D750</model>
+			<model focal='1.0'>sony SLT-A99V</model>
+			<model focal='1.5'>sony SLT-A77V</model>
+			<model focal='1.5'>sony ILCE-6000</model>
+			<model focal='1.0'>sony ILCE-7</model>
+			<model focal='1.0'>sony ILCE-7R</model>
+			<model focal='1.0'>sony ILCE-7M2</model>
+			<model focal='1.0'>sony ILCE-7RM2</model>
 		</camera>
 		<!-- The length width ratio of the photos -->
         <!-- The pos can be 'hor' or 'ver' or 'all' -->

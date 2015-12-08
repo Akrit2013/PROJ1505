@@ -2,6 +2,7 @@
 
 import time
 import glog as log
+import exif as ex
 
 
 def unixtime_to_datearr(timestamp):
@@ -22,53 +23,6 @@ def check(rsp):
         return False
 
 
-def exif_camera(exif):
-    """Get the camera model from exif info, if can not find one
-    return None
-    """
-    camera = exif.get('camera')
-    if camera is not None:
-        return camera
-
-    exifs = exif.findall('exif')
-    for info in exifs:
-        if info.get('label') == 'Model':
-            return info.find('raw').text
-    else:
-        return None
-
-
-def exif_focal(exif):
-    """Get the focal length from exif info, if not exists return None
-    """
-    exifs = exif.findall('exif')
-    for info in exifs:
-        if info.get('label') == 'Focal Length' or\
-                info.get('tag') == 'FocalLength':
-            return info.find('raw').text
-    pass
-
-
-def exif_lens(exif):
-    """Get lens type, return string or None
-    """
-    exifs = exif.findall('exif')
-    for info in exifs
-    pass
-
-
-def exif_aperture(exif):
-    """Get aperture info, return string or None
-    """
-    pass
-
-
-def exif_exposure(exif):
-    """Get shutter speed, return string of None
-    """
-    pass
-
-
 def pause(hit_limit=3500, last_hit=[0.0]):
     """According to the flickr limit, and the last time it been called,
     pause a certain mount of time, to avoid the flickr server over hit.
@@ -81,13 +35,115 @@ def pause(hit_limit=3500, last_hit=[0.0]):
     time_elaps = time_current - last_hit[0]
     if time_elaps < time_interval:
         time.sleep(time_interval-time_elaps)
+    last_hit[0] = time.time()
 
 
 def check_exif(exif, config):
     """Check if the exif is legal according to the config
-    return True or False
+    return True or False.
+    1. the focal_length should be found.
+    2. the camera model should be recognized.
     """
-    pass
+    if exif.focal_length is None:
+        return False
+    focal_rate = get_focal_rate(exif, config)
+    if focal_rate is None:
+        return False
+
+    return True
+
+
+def match_words(keywords, target):
+    """ Find if all the keywords exist in the target string.
+    If true, return True
+    Note: the keywords match is case in-sensitive, and the whole word
+    will be matched. e.g. d700 will match D700, but not d7000
+    Input:
+        keywords will be a list contain keyword list
+        target will be a string of words separated by space
+    """
+    # First, separate the target string into words
+    target_words = target.split(' ')
+    # Loop the keywords
+    for keyword in keywords:
+        for target_word in target_words:
+            if keyword.lower() == target_word.lower():
+                break
+        else:
+            return False
+    return True
+
+
+def get_focal_rate(exif, config):
+    """ First, determine the focal length rate relative to 135 format
+    camera, according to the camera model.
+    If the camera model can not be found in config, return None
+    """
+    camera_model_list = config.get_camera_model()
+    if camera_model_list is None:
+        log.error('Can not get camera_model in config object')
+        return None
+    # Split the camera model into several key words, and match it with
+    # the camera model in config. Only all key words can be matched, the
+    # corresponding focal rate will be returned.
+    camera_keywords = exif.camera.split(' ')
+    # Match the keywords with the camera_model_list
+    for camera_model in camera_model_list:
+        camera = camera_model[0]
+        focal_rate = float(camera_model[1])
+        if match_words(camera_keywords, camera):
+            return focal_rate
+    # If nothing can be matched, return None
+    return None
+
+
+def get_photo_pos(photo, config):
+    """Return the photo position: 'hor' or 'ver'
+    If can not find such info, return None
+    """
+    url_list = config.get_urls()
+    width = None
+    height = None
+    # Check if the photo support the required url
+    for url in url_list:
+        addr = photo.get(url)
+        if addr is None:
+            continue
+        # Get the height and width info
+        parts = url.split('_')
+        ext = parts[-1]
+        width_att = 'width_' + ext
+        height_att = 'height_' + ext
+        width = int(photo.get(width_att))
+        height = int(photo.get(height_att))
+
+    if width is None or height is None:
+        # Indicate the target url do not exist
+        return None
+    if width > height:
+        return 'hor'
+    else:
+        return 'ver'
+
+
+def get_focal_in35(exif, config):
+    """ This function convert the focal length in 135mm camera format.
+    First, it will attempt to read the FocalLengthIn35mmFormat section,
+    if exist, it will be returned as the result.
+    If not, it will calculate the 135 format focal length according to
+    the config
+    """
+    if exif.focal_in35 is not None:
+        return exif.focal_in35
+
+    if exif.focal_length is None:
+        return None
+
+    # Get the conreponding focal rate
+    rate = get_focal_rate(exif, config)
+    if rate is None:
+        return None
+    return int(rate*float(exif.focal_length))
 
 
 def get_exif(flickr, photo, config):
@@ -156,12 +212,12 @@ def get_exif(flickr, photo, config):
     if exif is None or exif.get('stat') != 'ok':
         log.error('The exif of photo: %s is None' % photo.get('id'))
         return None
-    exif = exif.find('photo')
+    myexif = ex.exif(exif)
     # Check if the exif content is legal
-    if check_exif(exif, config):
+    if check_exif(myexif, config):
         # Disp the exif info
-        log.info('Accept: %s, %s' % (exif_camera(exif), exif_focal(exif)))
-        return exif
+        log.info('Accept: %s, %s' % (myexif.camera, myexif.focal_length))
+        return myexif
     else:
-        log.info('Denied: %s, %s' % (exif_camera(exif), exif_focal(exif)))
+        log.info('Denied: %s, %s' % (myexif.camera, myexif.focal_length))
         return None
