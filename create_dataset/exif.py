@@ -39,14 +39,28 @@ class exif():
             if info.get('label') == 'Focal Length' or\
                     info.get('tag') == 'FocalLength':
                 return info.find('raw').text
+        return None
+
+    def get_focal_length_clean(self):
+        for info in self.exifs:
+            if info.get('label') == 'Focal Length' or\
+                    info.get('tag') == 'FocalLength':
+                try:
+                    rst = info.find('clean').text
+                except:
+                    rst = info.find('raw').text
+                return rst
+        return None
 
     def __get_focal_length(self):
         """Return the pure focal length like '18' '35' '50' instead of
         '18.0mm' or '35mm'
         """
-        focal = self.get_focal_length()
+        focal = self.get_focal_length_clean()
+        if focal is None:
+            return None
         rst = focal.split(' ')[0]
-        return rst.split('.')[0]
+        return rst
 
     def __get_focal_in35(self):
         """Get the focal length in 35mm camera
@@ -99,6 +113,8 @@ class exif():
         or '1/60'
         """
         exp = self.get_exposure()
+        if exp is None:
+            return None
         rst = exp.split('/')
         return rst[-1]
 

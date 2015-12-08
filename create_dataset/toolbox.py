@@ -3,6 +3,7 @@
 import time
 import glog as log
 import exif as ex
+import flickrapi.exceptions
 
 
 def unixtime_to_datearr(timestamp):
@@ -13,6 +14,17 @@ def unixtime_to_datearr(timestamp):
     timeArray = time.localtime(float(timestamp))
     timeArray = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
     return timeArray
+
+
+def seconds_to_days(seconds):
+    """Convert seconds into days, hours, and seconds, the return val is
+    a list, the format is [d, h, s]
+    """
+    sec = seconds % 3600
+    hours = int(seconds/3600)
+    hor = hours % 24
+    day = int(hours/24)
+    return [day, hor, sec]
 
 
 def check(rsp):
@@ -86,12 +98,11 @@ def get_focal_rate(exif, config):
     # Split the camera model into several key words, and match it with
     # the camera model in config. Only all key words can be matched, the
     # corresponding focal rate will be returned.
-    camera_keywords = exif.camera.split(' ')
     # Match the keywords with the camera_model_list
     for camera_model in camera_model_list:
-        camera = camera_model[0]
+        camera_keywords = camera_model[0].split(' ')
         focal_rate = float(camera_model[1])
-        if match_words(camera_keywords, camera):
+        if match_words(camera_keywords, exif.camera):
             return focal_rate
     # If nothing can be matched, return None
     return None
@@ -116,6 +127,7 @@ def get_photo_pos(photo, config):
         height_att = 'height_' + ext
         width = int(photo.get(width_att))
         height = int(photo.get(height_att))
+        break
 
     if width is None or height is None:
         # Indicate the target url do not exist
@@ -134,7 +146,7 @@ def get_focal_in35(exif, config):
     the config
     """
     if exif.focal_in35 is not None:
-        return exif.focal_in35
+        return int(exif.focal_in35)
 
     if exif.focal_length is None:
         return None
@@ -176,19 +188,20 @@ def get_exif(flickr, photo, config):
         height_att = 'height_' + ext
         width = int(photo.get(width_att))
         height = int(photo.get(height_att))
+        break
 
     if width is None or height is None:
         # Indicate the target url do not exist
         return None
 
     # Check if the length edge/short edge fit the config
-    lwrate = max(height, width) / min(height, width)
+    lwrate = float(max(height, width)) / min(height, width)
     # load the config
     lwratio_list = config.get_lwratio()
     # iter the config
     for lwratio in lwratio_list:
-        ratio = lwratio[0]
-        error = lwratio[1]
+        ratio = float(lwratio[0])
+        error = float(lwratio[1])
         pos = lwratio[2]
         # Check the pos
         if pos.lower() == 'hor':
@@ -207,7 +220,11 @@ def get_exif(flickr, photo, config):
     # Start to fetch the exif info
     # Pause if needed
     pause(config.hit_limit)
-    exif = flickr.photos.getExif(photo_id=photo.get('id'))
+    try:
+        exif = flickr.photos.getExif(photo_id=photo.get('id'))
+    except flickrapi.exceptions.FlickrError:
+        log.error('Denied: Get EXIF info of photo %s' % photo.get('id'))
+        return None
     # If exif return none, give warning
     if exif is None or exif.get('stat') != 'ok':
         log.error('The exif of photo: %s is None' % photo.get('id'))
@@ -216,8 +233,11 @@ def get_exif(flickr, photo, config):
     # Check if the exif content is legal
     if check_exif(myexif, config):
         # Disp the exif info
-        log.info('Accept: %s, %s' % (myexif.camera, myexif.focal_length))
+        log.info('\033[1;32;40mAccept\033[0m: %s, Focal %s, in35 %d' %
+                 (myexif.camera, myexif.focal_length,
+                  get_focal_in35(myexif, config)))
         return myexif
     else:
-        log.info('Denied: %s, %s' % (myexif.camera, myexif.focal_length))
+        log.info('\033[1;31;40mDenied\033[0m: %s, Focal %s' %
+                 (myexif.camera, myexif.focal_length))
         return None

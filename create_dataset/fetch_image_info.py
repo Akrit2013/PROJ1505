@@ -16,7 +16,8 @@ import sys
 import lmdbtools as lt
 import toolbox as tb
 import flickrapi
-import pdb
+import crash_on_ipy
+import time
 
 
 def main(argv):
@@ -44,10 +45,11 @@ def main(argv):
 
     # Parse the xml config file
     config = myxml.xmlconfig(config_file)
+    g_time_show_marker = time.time()
+    g_time_show = int(config.time_show)
 
     # Create the lmdb database
     # Check if the lmdb file is already exist
-    pdb.set_trace()
     db = lt.open_db(db_file)
     # Start to use flickrapi walk through the flickr server
     flickr = flickrapi.FlickrAPI(config.key, config.secret)
@@ -65,8 +67,8 @@ def main(argv):
         log.info('The timing mode is fixed')
         time_interval_num = float(config.time_interval)
 
-    log.info('Time interval is %s' %
-             tb.unixtime_to_datearr(time_interval_num))
+    log.info('Time interval is %d days %d hours %d secs' %
+             tuple(tb.seconds_to_days(time_interval_num)))
 
     scenes_list = config.get_scenes_labels()
     lens_list = config.get_lens_labels()
@@ -96,13 +98,15 @@ def main(argv):
             for scenes_label in scenes_list:
                 batch_counter += 1
                 text_str = lens_label + ', ' + scenes_label
-                log.info('Fetch date %s-%s, label: %s, db_size: %d' %
+                log.info('\033[1;33mFetch date %s-%s, label: %s\033[0m' %
                          (tb.unixtime_to_datearr(start_time),
                           tb.unixtime_to_datearr(end_time),
-                          text_str, db_size))
-                log.info('Time interval: %s' %
-                         tb.unixtime_to_datearr(time_interval_num))
-                log.info('Fetch Photos: %d, Qualified Photos: %d, Db Size: %d'
+                          text_str))
+                log.info('\033[1;33mTime interval: %d days %d hours \
+%d secs\033[0m' %
+                         tuple(tb.seconds_to_days(time_interval_num)))
+                log.info('\033[1;33mFetch Photos: %d, Qualified Photos: %d\
+, Db Size: %d\033[0m'
                          % (g_photo_counter, g_qualified_counter, db_size))
                 # Search the photos according to the label
                 # A list to store all the fetched photos
@@ -114,15 +118,29 @@ def main(argv):
                                          content_type=1,
                                          extras=extra_str,
                                          per_page=int(config.page_size)):
-                    # Store all the photos into a list
+                    # Show the overall info if X sec passed
+                    if time.time() - g_time_show_marker > g_time_show:
+                        g_time_show_marker = time.time()
+                        log.info('\033[1;33mFetch date %s-%s, label: %s\033[0m'
+                                 % (tb.unixtime_to_datearr(start_time),
+                                    tb.unixtime_to_datearr(end_time),
+                                    text_str))
+                        log.info('\033[1;33mFetch Photos: %d, Qualified Photos:\
+%d, Db Size: %d\033[0m' % (g_photo_counter,
+                                 g_qualified_counter, db_size))
                     photo_counter += 1
+                    g_photo_counter += 1
+                    # Check the database if the photo is already been recorded
+                    if lt.check_photo_id(photo.get('id')):
+                        continue
                     # Check the photo, and fetch the exif if needed
-                    exif = tb.get_exif(flickr, photo)
+                    exif = tb.get_exif(flickr, photo, config)
                     # If photo info and exif is invalid, return None
                     if exif is None:
                         continue
                     else:
                         qualified_counter += 1
+                        g_qualified_counter += 1
                     # Write the exif, photo info, label into db
                     # The database size should be returned
                     db_size = lt.write_db(db, exif, photo, text_str, config)

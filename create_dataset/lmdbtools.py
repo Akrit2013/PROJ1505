@@ -7,6 +7,7 @@ import os
 import glog as log
 import toolbox as tb
 import xml.etree.ElementTree as ET
+import yaml
 
 
 def open_db(lmdb_file):
@@ -53,6 +54,8 @@ def pack(exif, photo, label, config=None):
     package['photo'] = ET.tostring(photo, encoding='utf8', method='xml')
     # Convert exif to xml string
     package['exif'] = ET.tostring(exif.exif, encoding='utf8', method='xml')
+    # Pack the dict to string
+    package = yaml.dump(package)
     return package
 
 
@@ -80,9 +83,24 @@ def write_db(db, exif=None, photo=None, label=None, config=None):
     """
     key = exif.id
     # Pack the needed info into a single string
-    value = pack(exif, photo, label)
+    value = pack(exif, photo, label, config)
     with db.begin(write=True) as txn:
         txn.put(key, value)
     # Return the size of the dataset
     stat = db.stat()
     return stat['entries']
+
+
+def check_photo_id(db, photo_id):
+    """Check if the lmdb database already have the given photo, if true
+    return True, else, return False
+    """
+    rst = None
+    # Don't allow write, and use buffers to avoid memory copy
+    with db.begin(write=False, buffers=True) as txn:
+        val = txn.get(photo_id)
+        if val is None:
+            rst = False
+        else:
+            rst = True
+    return rst

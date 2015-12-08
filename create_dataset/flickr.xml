@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <flickr ver='1.0'>
-	<auth key='xxxxxxxx' secret='xxxxxxxxxxxx' />
 	<!-- The type can be 'dynamic' or 'fixed' -->
 	<time type='dynamic'>
 		<!-- format can be 'flickr' or 'unix' -->
@@ -12,6 +11,8 @@
 		<time_interval_min val='259200' format='unix' />
 		<time_interval_max val='7776000' format='unix' />
 		<time_interval_init val='2592000' format='unix' />
+		<!-- Show the overall information every X sec -->
+		<time_show val='30' format='unix' />
 	</time>
 	<fetch maxsize='2000000' batchsize='1000'>
 		<page size='500' />
@@ -62,6 +63,7 @@
 		<camera>
 			<model focal='1.6'>canon rebel</model>
 			<model focal='1.6'>canon kiss</model>
+			<model focal='1.6'>canon 300D</model>
 			<model focal='1.6'>canon 350D</model>
 			<model focal='1.6'>canon 400D</model>
 			<model focal='1.6'>canon 450D</model>
@@ -72,6 +74,7 @@
 			<model focal='1.6'>canon 700D</model>
 			<model focal='1.6'>canon 750D</model>
 			<model focal='1.6'>canon 760D</model>
+			<model focal='1.6'>canon 30D</model>
 			<model focal='1.6'>canon 40D</model>
 			<model focal='1.6'>canon 50D</model>
 			<model focal='1.6'>canon 60D</model>
@@ -84,10 +87,15 @@
 			<model focal='1.0'>canon 6D</model>
 			<model focal='1.0'>canon 1ds</model>
 			<model focal='1.3'>canon 1d</model>
+			<model focal='1.5'>nikon D40</model>
+			<model focal='1.5'>nikon D40x</model>
+			<model focal='1.5'>nikon D50</model>
 			<model focal='1.5'>nikon D60</model>
 			<model focal='1.5'>nikon D70</model>
+			<model focal='1.5'>nikon D70s</model>
 			<model focal='1.5'>nikon D80</model>
 			<model focal='1.5'>nikon D90</model>
+			<model focal='1.5'>nikon D100</model>
 			<model focal='1.5'>nikon D200</model>
 			<model focal='1.5'>nikon D300</model>
 			<model focal='1.5'>nikon D300s</model>
@@ -111,6 +119,24 @@
 			<model focal='1.0'>nikon D600</model>
 			<model focal='1.0'>nikon D610</model>
 			<model focal='1.0'>nikon D750</model>
+			<model focal='1.0'>nikon D3</model>
+			<model focal='1.0'>nikon D3X</model>
+			<model focal='1.0'>nikon D3S</model>
+			<model focal='1.0'>nikon D4</model>
+			<model focal='1.0'>nikon D4S</model>
+			<model focal='1.5'>sony DSLR-A100</model>
+			<model focal='1.5'>sony DSLR-A200</model>
+			<model focal='1.5'>sony DSLR-A300</model>
+			<model focal='1.5'>sony DSLR-A350</model>
+			<model focal='1.0'>sony DSLR-A900</model>
+			<model focal='1.0'>sony DSLR-A850</model>
+			<model focal='1.5'>sony DSLR-A500</model>
+			<model focal='1.5'>sony DSLR-A550</model>
+			<model focal='1.5'>sony DSLR-A450</model>
+			<model focal='1.5'>sony DSLR-A290</model>
+			<model focal='1.5'>sony DSLR-A390</model>
+			<model focal='1.5'>sony DSLR-A580</model>
+			<model focal='1.5'>sony DSLR-A560</model>
 			<model focal='1.0'>sony SLT-A99V</model>
 			<model focal='1.5'>sony SLT-A77V</model>
 			<model focal='1.5'>sony ILCE-6000</model>
@@ -118,6 +144,13 @@
 			<model focal='1.0'>sony ILCE-7R</model>
 			<model focal='1.0'>sony ILCE-7M2</model>
 			<model focal='1.0'>sony ILCE-7RM2</model>
+			<model focal='1.5'>sony NEX-7</model>
+			<model focal='1.5'>sony NEX-3</model>
+			<model focal='1.5'>sony NEX-5</model>
+			<model focal='1.5'>sony NEX-5N</model>
+			<model focal='1.5'>sony NEX-5T</model>
+			<model focal='1.5'>sony NEX-5R</model>
+			<model focal='1.5'>sony NEX-6</model>
 		</camera>
 		<!-- The length width ratio of the photos -->
         <!-- The pos can be 'hor' or 'ver' or 'all' -->

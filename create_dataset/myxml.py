@@ -52,6 +52,7 @@ class xmlconfig():
         self.time_interval_max = self.get_interval_max()
         self.time_interval_init = self.get_interval_init()
         self.time_dynamic = self.is_dynamic_time()
+        self.time_show = self.get_show_time()
         self.hit_limit = self.get_hit_limit()
         self.page_size = self.get_page_size()
         self.max_size = self.get_max_size()
@@ -120,6 +121,9 @@ class xmlconfig():
 
     def get_interval_init(self):
         return self.__get_time('time_interval_init')
+
+    def get_show_time(self):
+        return self.__get_time('time_show')
 
     def get_scenes_labels(self):
         """Get all scene labels from the xml config file, return them
@@ -194,11 +198,11 @@ class xmlconfig():
         if self.photoscreen is None:
             return None
         model_list = self.photoscreen.find('camera').findall('model')
-        model_dict = {}
+        rst = []
         for model in model_list:
-            model_dict[model.text] = model.attrib['focal']
+            rst.append([model.text, model.attrib['focal']])
 
-        return model_dict
+        return rst
 
     def get_lwratio(self):
         """
