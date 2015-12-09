@@ -5,6 +5,7 @@ import xml.etree.ElementTree as et
 import glog as log
 import time
 import datetime
+from lxml import etree
 
 
 class xmlconfig():
@@ -219,3 +220,16 @@ class xmlconfig():
                        ratio.attrib['pos']])
 
         return rst
+
+
+def parse_xml_to_etree(xml_str):
+    """This function parse the given xml string to etree object
+    """
+    try:
+        etree_obj = et.fromstring(xml_str)
+    except et.ParseError:
+        # Try to ignore the error
+        parser = etree.XMLParser(recover=True)
+        etree_obj = et.fromstring(xml_str, parser=parser)
+
+    return etree_obj

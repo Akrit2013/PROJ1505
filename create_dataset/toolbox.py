@@ -4,6 +4,8 @@ import time
 import glog as log
 import exif as ex
 import flickrapi.exceptions
+import os
+import urllib
 
 
 def unixtime_to_datearr(timestamp):
@@ -248,3 +250,53 @@ def get_exif(flickr, photo, config):
         log.info('\033[1;31;40mDenied\033[0m: %s, Focal %s' %
                  (myexif.camera, myexif.focal_length))
         return [myexif, False]
+
+
+def check_path(path, create_if_not=True):
+    """Check if the path exist, if true, return True. If not exist:
+    If create_if_not=True, create it and return False. or
+    If create_if_not=False, return False
+    """
+    if os.path.exists(path):
+        return True
+    if create_if_not:
+        try:
+            os.makedirs(path)
+        except:
+            log.error('\033[0;31mFailed to create path %s\033[0m' % path)
+            raise
+
+    return False
+
+
+def get_url(photo, url_str_list):
+    """Get the url address from the photo according to the url_list
+    it will check the elements of url_list in sequence. If found one
+    then return.
+    If no url can be found, return None
+    """
+    url = None
+    for url_str in url_str_list:
+        url = photo.get(url_str)
+        if url is not None:
+            break
+    return url
+
+
+def download_url_and_save(url, photo_id, path=None):
+    """Download the image from the given url, and save it in the given path
+    the image is renamed as the photo_id
+    """
+    data = urllib.urlopen(url).read()
+    ext = '.jpg'
+    if path is None:
+        file_path = photo_id + ext
+    else:
+        if path[-1] == r'/':
+            file_path = path + photo_id + ext
+        else:
+            file_path = path + r'/' + photo_id + ext
+
+    f = file(file_path, 'wb')
+    f.write(data)
+    f.close()
