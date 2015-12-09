@@ -127,3 +127,27 @@ def check_photo_id(db, photo_id):
         else:
             rst = True
     return rst
+
+
+def update_label(db, photo_id, label):
+    """Although the photo_id is already exists in the database
+    The current label might be different from the stored one
+    This function will load the photo info add the new label to
+    the old ones, and rewrite it into the database
+    """
+    with db.begin(write=True) as txn:
+        val = txn.get(photo_id)
+        val_dict = yaml.load(val)
+        label_list = val_dict['label']
+        # loop the labels and add the new label if needed
+        for label_new in label:
+            for label_old in label_list:
+                if label_new.lower() == label_old.lower():
+                    break
+            else:
+                label_list.append(label_new)
+
+        # Write back to db
+        val_dict['label'] = label_list
+        val = yaml.dump(val_dict)
+        txn.put(photo_id, val)

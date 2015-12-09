@@ -60,6 +60,11 @@ class exif():
         if focal is None:
             return None
         rst = focal.split(' ')[0]
+        # Make sure the focal_length can be changed into int
+        try:
+            int(rst)
+        except ValueError:
+            return None
         return rst
 
     def __get_focal_in35(self):
@@ -69,6 +74,11 @@ class exif():
             if info.get('label') == 'Focal Length (35mm format)' or\
                     info.get('tag') == 'FocalLengthIn35mmFormat':
                 focal = info.find('raw').text
+                # Make sure the value make scene
+                try:
+                    int(focal)
+                except ValueError:
+                    return None
                 return focal.split(' ')[0]
         else:
             return None

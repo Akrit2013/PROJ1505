@@ -95,6 +95,7 @@ def main(argv):
     while time_current_num < time_end_num:
         start_time = str(time_current_num)
         end_time = str(time_current_num + time_interval_num)
+        time_current_num += time_interval_num
         text_str = None
         extra_str = config.urls + ', ' + 'tags'
         # Counter in this time slice
@@ -141,6 +142,9 @@ def main(argv):
                     g_photo_counter += 1
                     # Check the database if the photo is already been recorded
                     if lt.check_photo_id(db, photo.get('id')):
+                        # Update the label if needed
+                        lt.update_label(db, photo.get('id'),
+                                        [scenes_label, lens_label])
                         continue
                     if lt.check_photo_id(db_trash, photo.get('id')):
                         continue
@@ -156,7 +160,8 @@ def main(argv):
                             qualified_counter += 1
                             g_qualified_counter += 1
                             db_size = lt.write_db(db, exif, photo,
-                                                  text_str, config)
+                                                  [scenes_label, lens_label],
+                                                  config)
                         else:
                             db_trash_size = lt.write_db(db_trash, exif, photo,
                                                         text_str, config)
