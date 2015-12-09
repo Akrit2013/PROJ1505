@@ -145,6 +145,8 @@ def get_focal_in35(exif, config):
     If not, it will calculate the 135 format focal length according to
     the config
     """
+    if exif is None:
+        return None
     if exif.focal_in35 is not None:
         return int(exif.focal_in35)
 
@@ -172,6 +174,11 @@ def get_exif(flickr, photo, config):
     Parameters:
     photo is the etree object only contrain the photo section
     config is a myxml.xmlconfig object
+    Return:
+    If the photo is illegal and no exif is got, return None
+    If the exif is got but contrain no useful info, return [exif, False]
+    If the exif fetch is denied, return [None, False]
+    If the exif is got and ok, return [exif, True]
     """
     url_list = config.get_urls()
     width = None
@@ -224,11 +231,11 @@ def get_exif(flickr, photo, config):
         exif = flickr.photos.getExif(photo_id=photo.get('id'))
     except flickrapi.exceptions.FlickrError:
         log.error('Denied: Get EXIF info of photo %s' % photo.get('id'))
-        return None
+        return [None, False]
     # If exif return none, give warning
     if exif is None or exif.get('stat') != 'ok':
         log.error('The exif of photo: %s is None' % photo.get('id'))
-        return None
+        return [None, False]
     myexif = ex.exif(exif)
     # Check if the exif content is legal
     if check_exif(myexif, config):
@@ -236,8 +243,8 @@ def get_exif(flickr, photo, config):
         log.info('\033[1;32;40mAccept\033[0m: %s, Focal %s, in35 %d' %
                  (myexif.camera, myexif.focal_length,
                   get_focal_in35(myexif, config)))
-        return myexif
+        return [myexif, True]
     else:
         log.info('\033[1;31;40mDenied\033[0m: %s, Focal %s' %
                  (myexif.camera, myexif.focal_length))
-        return None
+        return [myexif, False]
