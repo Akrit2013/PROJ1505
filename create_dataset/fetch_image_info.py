@@ -18,6 +18,7 @@ import toolbox as tb
 import flickrapi
 import crash_on_ipy
 import time
+from requests.exceptions import ConnectionError
 
 
 def main(argv):
@@ -99,13 +100,12 @@ def main(argv):
         text_str = None
         extra_str = config.urls + ', ' + 'tags'
         # Counter in this time slice
-        photo_counter = 0
         qualified_counter = 0
-        batch_counter = 0
+        photo_counter_max = 0
         # Loop the labels
         for lens_label in lens_list:
             for scenes_label in scenes_list:
-                batch_counter += 1
+                photo_counter = 0
                 text_str = lens_label + ', ' + scenes_label
                 log.info('\033[1;33mFetch date %s-%s, label: %s\033[0m' %
                          (tb.unixtime_to_datearr(start_time),
@@ -149,7 +149,12 @@ def main(argv):
                     if lt.check_photo_id(db_trash, photo.get('id')):
                         continue
                     # Check the photo, and fetch the exif if needed
-                    rst = tb.get_exif(flickr, photo, config)
+                    try:
+                        rst = tb.get_exif(flickr, photo, config)
+                    except ConnectionError as e:
+                        log.error('\033[0;31mFetch Exif Error:\033[0m %s' % e)
+                        continue
+
                     # If photo info and exif is invalid, return None
                     if rst is None:
                         continue
@@ -165,16 +170,24 @@ def main(argv):
                         else:
                             db_trash_size = lt.write_db(db_trash, exif, photo,
                                                         text_str, config)
-                    # Write the exif, photo info, label into db
-                    # The database size should be returned
+                # Record the max batch size
+                if photo_counter_max < photo_counter:
+                    photo_counter_max = photo_counter
+
         # Finish the data slice loop, re-adjust the time_interval_num
         if config.time_dynamic:
-            # Dynamically adjust the time interval
-            mean_fetch_size = float(photo_counter) / batch_counter
-            if mean_fetch_size > 1.2 * int(config.batch_size):
+            # Dynamically adjust the time interval according to
+            # the max size of the fetch batch
+            if photo_counter_max > 1.2 * int(config.batch_size):
                 time_interval_num = int(time_interval_num / 1.2)
-            elif mean_fetch_size < 0.8 * int(config.batch_size):
+            elif photo_counter_max < 0.8 * int(config.batch_size):
                 time_interval_num = int(time_interval_num / 0.8)
+
+            if time_interval_num > float(config.time_interval_max):
+                time_interval_num = float(config.time_interval_max)
+            if time_interval_num < float(config.time_interval_min):
+                time_interval_num = float(config.time_interval_min)
+
         # If the photo collected more than enough, make it stop
         if db_size > config.max_size:
             log.info('Total collected photos: %d, stop at %s' %

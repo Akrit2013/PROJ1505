@@ -269,13 +269,16 @@ def check_path(path, create_if_not=True):
     return False
 
 
-def get_url(photo, url_str_list):
+def get_url(photo, url_str_list, reverse=False):
     """Get the url address from the photo according to the url_list
     it will check the elements of url_list in sequence. If found one
     then return.
     If no url can be found, return None
     """
     url = None
+    if reverse:
+        url_str_list = url_str_list[::-1]
+
     for url_str in url_str_list:
         url = photo.get(url_str)
         if url is not None:
@@ -283,11 +286,10 @@ def get_url(photo, url_str_list):
     return url
 
 
-def download_url_and_save(url, photo_id, path=None):
+def download_url_and_save(url, photo_id, overwrite=True, path=None):
     """Download the image from the given url, and save it in the given path
     the image is renamed as the photo_id
     """
-    data = urllib.urlopen(url).read()
     ext = '.jpg'
     if path is None:
         file_path = photo_id + ext
@@ -297,6 +299,11 @@ def download_url_and_save(url, photo_id, path=None):
         else:
             file_path = path + r'/' + photo_id + ext
 
+    # If overwrite is False, ignore the url
+    if overwrite is False and os.path.exists(file_path):
+        log.warning('%s already exists, ignoring...' % file_path)
+        return
+    data = urllib.urlopen(url).read()
     f = file(file_path, 'wb')
     f.write(data)
     f.close()

@@ -1,11 +1,14 @@
 #!/usr/bin/python
 
 import easyprogressbar
+import glog as log
+from requests.exceptions import ConnectionError
 
 
 def tt():
     a = 1
     b = 2
+    raise ConnectionError
     return a, b
 
 
@@ -16,8 +19,12 @@ def main():
         print i
         pb.update(i)
     pb.finish()
-    a = tt()
-    print a
+    try:
+        tt()
+    except ConnectionError as e:
+        print e
+        log.error('Error: %s' % e)
+    print 'finish'
 
 
 if __name__ == "__main__":

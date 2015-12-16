@@ -3,45 +3,30 @@
 	<!-- The type can be 'dynamic' or 'fixed' -->
 	<time type='dynamic'>
 		<!-- format can be 'flickr' or 'unix' -->
-		<time_start val='2008-01-01' format='flickr' />
+		<time_start val='2008-07-31' format='flickr' />
 		<time_end val='2015-11-30' format='flickr' />
 		<!-- 30 days -->
+		<!--time_interval val='2592000' format='unix' /-->
+		<!-- 60 days -->
 		<time_interval val='2592000' format='unix' />
 		<!-- 3 days -->
 		<time_interval_min val='259200' format='unix' />
 		<time_interval_max val='7776000' format='unix' />
-		<time_interval_init val='2592000' format='unix' />
+		<time_interval_init val='5184000' format='unix' />
 		<!-- Show the overall information every X sec -->
 		<time_show val='30' format='unix' />
 	</time>
-	<fetch maxsize='2000000' batchsize='1000'>
+	<fetch maxsize='2000000' batchsize='2000'>
 		<page size='500' />
 		<labels type='scenes'>
 			<label class='0'>portrait</label>
-			<label class='0'>familyit</label>
-			<label class='0'>boy</label>
-			<label class='0'>girl</label>
-			<label class='1'>indoor</label>
-			<label class='1'>living room</label>
-			<label class='1'>hail</label>
-			<label class='1'>corridor</label>
-			<label class='2'>street</label>
-			<label class='2'>road</label>
-			<label class='2'>building</label>
-			<label class='2'>square</label>
-			<label class='3'>landview</label>
-			<label class='4'>forest</label>
-			<label class='4'>beach</label>
-			<label class='4'>landscope</label>
-			<label class='4'>open country</label>
-			<label class='5'>tour</label>
-			<label class='5'>travel</label>
-			<label class='5'>trip</label>
-			<label class='5'>journey</label>
 		</labels>
 		<labels type='lens'>
 			<label class='0'>fisheye</label>
+			<label class='0'>ultra wide</label>
 			<label class='1'>ultrawide</label>
+			<label class='1'>wide angle</label>
+			<label class='1'>14mm</label>
 			<label class='2'>24mm</label>
 			<label class='3'>35mm</label>
 			<label class='4'>50mm</label>
@@ -49,9 +34,15 @@
 			<label class='6'>70-200</label>
 			<label class='6'>135mm</label>
 			<label class='6'>200mm</label>
+			<label class='6'>telephoto</label>
+			<label class='6'>canon</label>
+			<label class='6'>nikon</label>
+			<label class='6'>nikkor</label>
+			<label class='6'>sony</label>
 		</labels>
 		<urls>
 			<url>url_n</url>
+			<url>url_c</url>
 			<url>url_z</url>
 		</urls>
 	</fetch>
@@ -85,8 +76,8 @@
 			<model focal='1.6'>canon 7D</model>
 			<model focal='1.0'>canon 5D</model>
 			<model focal='1.0'>canon 6D</model>
-			<model focal='1.0'>canon 1ds</model>
-			<model focal='1.3'>canon 1d</model>
+			<model focal='1.0'>canon EOS-1ds</model>
+			<model focal='1.3'>canon EOS-1d</model>
 			<model focal='1.5'>nikon D40</model>
 			<model focal='1.5'>nikon D40x</model>
 			<model focal='1.5'>nikon D50</model>
@@ -128,6 +119,7 @@
 			<model focal='1.5'>sony DSLR-A200</model>
 			<model focal='1.5'>sony DSLR-A300</model>
 			<model focal='1.5'>sony DSLR-A350</model>
+			<model focal='1.5'>sony DSLR-A700</model>
 			<model focal='1.0'>sony DSLR-A900</model>
 			<model focal='1.0'>sony DSLR-A850</model>
 			<model focal='1.5'>sony DSLR-A500</model>

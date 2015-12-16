@@ -16,10 +16,12 @@ import crash_on_ipy
 def main(argv):
     db_file = None
     data_path = '../data'
-    help_msg = 'download_image.py -i <lmdbfile> -o[optional] <datapath>'
+    overwrite = False
+    help_msg = 'download_image.py -i <lmdbfile> -o[optional] <datapath>\
+--overwrite[optional]'
 
     try:
-        opts, args = getopt.getopt(argv, 'hi:o:')
+        opts, args = getopt.getopt(argv, 'hi:o:', ['overwrite'])
     except getopt.GetoptError:
         print help_msg
         sys.exit(2)
@@ -32,6 +34,8 @@ def main(argv):
             db_file = arg
         elif opt == '-o':
             data_path = arg
+        elif opt == '--overwrite':
+            overwrite = True
         else:
             print help_msg
             sys.exit(2)
@@ -62,12 +66,12 @@ def main(argv):
                 val_dic = yaml.load(val)
                 # Get the avaliable url to download photo
                 photo = myxml.parse_xml_to_etree(val_dic['photo'])
-                url = tb.get_url(photo, val_dic['urls'])
+                url = tb.get_url(photo, val_dic['urls'], True)
                 # Download the url and save image
                 log.info('Download %s from %s [%d/%d]' %
                          (key, url, counter, entries))
                 try:
-                    tb.download_url_and_save(url, key, data_path)
+                    tb.download_url_and_save(url, key, overwrite, data_path)
                 except:
                     log.error('\033[0;31mFailed to download %s from %s\033[0m'
                               % (key, url))
