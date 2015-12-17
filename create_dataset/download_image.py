@@ -42,7 +42,7 @@ def main(argv):
         elif opt == '--overwrite':
             overwrite = True
         elif opt == '--skip':
-            skip_num == int(arg)
+            skip_num = int(arg)
         else:
             print help_msg
             sys.exit(2)
