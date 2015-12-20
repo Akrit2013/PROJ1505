@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<classifier ver='1.0'>
+    <class id='0' minfocal='0' maxfocal='20' label='wide' />
+    <class id='1' minfocal='35' maxfocal='65' label='middle' />
+    <class id='2' minfocal='100' maxfocal='300' label='tele' />
+</classifier>

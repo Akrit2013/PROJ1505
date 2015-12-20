@@ -33,5 +33,4 @@ class EasyProgressBar():
             val = 100.0
         elif val < 0:
             val = 0.0
-        print val
         self.pb.update(val)

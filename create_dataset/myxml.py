@@ -233,3 +233,38 @@ def parse_xml_to_etree(xml_str):
         etree_obj = et.fromstring(xml_str, parser=parser)
 
     return etree_obj
+
+
+def parse_classifier_xml(config):
+    """This function load the classifier xml file and parse the content
+    a dict will be returned. The key is the int class number: 0~N
+    the corresponding val is a list: [min_focal, max_focal]. e.g.
+    {0: [10. 24], 1: [35, 50]. 2: [100. 200]}
+    NOTE: All return values are int type
+
+    If error, return None
+    """
+    try:
+        root = et.parse(config).getroot()
+    except:
+        log.error('%s can not be parsed' % config)
+        return None
+    try:
+        classes = root.findall('class')
+    except:
+        log.error('Can not find class section in %s' % config)
+        return None
+    rst = {}
+    for cl in classes:
+        try:
+            class_id = int(cl.get('id'))
+            class_min_focal = int(cl.get('minfocal'))
+            class_max_focal = int(cl.get('maxfocal'))
+            if class_max_focal < class_min_focal:
+                log.warn('maxfocal must larger than minfocal in %s' %
+                         et.tostring(cl))
+        except:
+            log.error('Error in parsing %s' % et.tostring(cl))
+            return None
+        rst[class_id] = [class_min_focal, class_max_focal]
+    return rst
